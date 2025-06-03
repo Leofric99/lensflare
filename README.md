@@ -1,2 +1,2 @@
-# tog_meteo
+# lensflare
 A condition prediction app for Photographers.
