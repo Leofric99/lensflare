@@ -2,6 +2,7 @@ from . import location
 from . import weather
 from . import predict
 from . import graph
+from . import llm
 import json
 
 def condition_menu():
@@ -36,6 +37,8 @@ def condition_menu():
     
 
 def main():
+
+
     print("=" * 40)
     print("   🌤️  Welcome to Meteo Photo!  🌤️")
     print("=" * 40)
@@ -49,30 +52,49 @@ def main():
             print()
     latitude, longitude = coordinates
 
-    open_meteo_forecast_7days, sunrise_sunset_times_7days = weather.open_meteo_hourly_forecast_7days(latitude, longitude)
+    llm_query = input("\n💬 Enter your query for the weather conditions (next 7 days):\n> ")
+    data_list = llm.initial_request(llm_query)
 
-    while True:
+    if llm.check_list_format(data_list).lower() == "yes":
+
+        data_list = json.loads(data_list)
         
-        selected_condition = condition_menu()
-
-        if selected_condition is None:
-            continue
-        if selected_condition == "rain":
-            graph.rain(open_meteo_forecast_7days)
-
-        elif selected_condition == "mist":
-            mist, readable_result = predict.mist(open_meteo_forecast_7days)
-            if mist:
-                print("\nMist is predicted on:\n")
-                for item in readable_result:
-                    print(item)
-
-        elif selected_condition == "fog":
-            fog = predict.fog(open_meteo_forecast_7days)
-            if fog:
-                print(json.dumps(fog, indent=4))
+        hourly_forecast, daily_forecast = weather.open_meteo_hourly_forecast_7days(latitude, longitude)
         
-    
+        for item in data_list:
+            if item == "sunrise":
+                nice_sunriseset_times = predict.sunset_sunrise(hourly_forecast, daily_forecast)
+            elif item == "sunset":
+                pass
+            elif item == "clear":
+                pass
+            elif item == "rain":
+                pass
+            elif item == "mist":
+                mist_predicted = predict.mist(hourly_forecast)
+            elif item == "fog":
+                fog_predicted = predict.fog(hourly_forecast)
+            elif item == "snow":
+                pass
+            elif item == "hail":
+                pass
+            elif item == "sleet":
+                pass
+            elif item == "drizzle":
+                pass
+            elif item == "cloudy":
+                pass
+            elif item == "wind":
+                pass
+            elif item == "full_moon":
+                pass
+            elif item == "new_moon":
+                pass
+            else:
+                pass
+
+        
+
 
 
 

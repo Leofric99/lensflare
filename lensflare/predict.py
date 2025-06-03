@@ -24,25 +24,7 @@ def mist(open_meteo_forecast_7days):
                 "time": entry.get("time")
             })
 
-    formatted = []
-    for item in result:
-        date_str = item["date"]
-        hour_str = item["time"].zfill(2)
-        dt = datetime.strptime(f"{date_str} {hour_str}", "%Y-%m-%d %H")
-        day = dt.strftime("%A")
-        day_num = dt.day
-        # Suffix for day
-        if 4 <= day_num <= 20 or 24 <= day_num <= 30:
-            suffix = "th"
-        else:
-            suffix = ["st", "nd", "rd"][day_num % 10 - 1]
-        month = dt.strftime("%B")
-        year = dt.year
-        time_str = dt.strftime("%H:00")
-        formatted.append(f"{day} {day_num}{suffix} {month} at {time_str}")
-    readable_result = formatted
-
-    return result, readable_result
+    return result
 
 
 def fog(open_meteo_forecast_7days):
@@ -69,3 +51,42 @@ def fog(open_meteo_forecast_7days):
             })
 
     return result
+
+
+def sunset_sunrise(hourly_forecast, daily_forecast):
+
+    good_entries = []
+
+    for entry in hourly_forecast:
+        cloud_cover = entry.get("cloud_cover", 0)
+        cloud_low = entry.get("cloud_cover_low", 0)
+        cloud_mid = entry.get("cloud_cover_mid", 0)
+        cloud_high = entry.get("cloud_cover_high", 0)
+        humidity = entry.get("relative_humidity_2m", 0)
+        visibility = entry.get("visibility", 0)
+        rain = entry.get("rain", 0)
+        showers = entry.get("showers", 0)
+        precipitation = entry.get("precipitation", 0)
+        temperature = entry.get("temperature_2m", 0)
+        dew_point = entry.get("dew_point_2m", 0)
+        wind_speed = entry.get("wind_speed_10m", 0)
+
+        # Apply ideal conditions for photo-worthy sky
+        if not (30 <= cloud_cover <= 70 or (cloud_low >= 50 and cloud_cover <= 85)):
+            continue
+        if cloud_high > 30:
+            continue
+        if humidity > 85:
+            continue
+        if visibility < 10000:
+            continue
+        if rain > 0 or showers > 0 or precipitation > 0:
+            continue
+        if wind_speed > 25:
+            continue
+        if (temperature - dew_point) < 2:
+            continue
+
+        good_entries.append(entry)
+
+    return good_entries
