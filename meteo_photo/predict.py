@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 
 def mist(open_meteo_forecast_7days):
     result = []
@@ -23,7 +24,25 @@ def mist(open_meteo_forecast_7days):
                 "time": entry.get("time")
             })
 
-    return result
+    formatted = []
+    for item in result:
+        date_str = item["date"]
+        hour_str = item["time"].zfill(2)
+        dt = datetime.strptime(f"{date_str} {hour_str}", "%Y-%m-%d %H")
+        day = dt.strftime("%A")
+        day_num = dt.day
+        # Suffix for day
+        if 4 <= day_num <= 20 or 24 <= day_num <= 30:
+            suffix = "th"
+        else:
+            suffix = ["st", "nd", "rd"][day_num % 10 - 1]
+        month = dt.strftime("%B")
+        year = dt.year
+        time_str = dt.strftime("%H:00")
+        formatted.append(f"{day} {day_num}{suffix} {month} at {time_str}")
+    readable_result = formatted
+
+    return result, readable_result
 
 
 def fog(open_meteo_forecast_7days):

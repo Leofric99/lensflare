@@ -7,18 +7,18 @@ import json
 def condition_menu():
     print("\nSelect a weather condition to check:")
     options = [
-        "rain",
-        "mist",
-        "fog",
-        "good_sunset",
-        "good_sunrise",
-        "full_moon",
-        "new_moon",
-        "clear_skies"
+        ("☀️", "clear_skies"),
+        ("🌧️", "rain"),
+        ("🌫️", "mist"),
+        ("🌁", "fog"),
+        ("🌇", "good_sunset"),
+        ("🌅", "good_sunrise"),
+        ("🌕", "full_moon"),
+        ("🌑", "new_moon"),
     ]
-    for idx, option in enumerate(options, 1):
-        print(f"{idx}. {option}")
-    print(f"{len(options) + 1}. Exit")
+    for idx, (emoji, option) in enumerate(options, 1):
+        print(f"{idx}. {emoji} {option}")
+    print(f"{len(options) + 1}. 🚪 Exit")
 
     choice = input("\nEnter the number of your choice:\n> ")
     try:
@@ -26,7 +26,7 @@ def condition_menu():
         if choice_num == len(options) + 1:
             print("\nExiting. Goodbye!")
             exit(0)
-        selected_condition = options[choice_num - 1]
+        selected_condition = options[choice_num - 1][1]
         print(f"\nYou selected: {selected_condition}")
     except (IndexError, ValueError):
         print("\nInvalid selection. Please try again.")
@@ -59,10 +59,14 @@ def main():
             continue
         if selected_condition == "rain":
             graph.rain(open_meteo_forecast_7days)
+
         elif selected_condition == "mist":
-            mist = predict.mist(open_meteo_forecast_7days)
+            mist, readable_result = predict.mist(open_meteo_forecast_7days)
             if mist:
-                print(json.dumps(mist, indent=4))
+                print("\nMist is predicted on:\n")
+                for item in readable_result:
+                    print(item)
+
         elif selected_condition == "fog":
             fog = predict.fog(open_meteo_forecast_7days)
             if fog:
